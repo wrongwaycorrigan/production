@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Directory containing the source files
+SRC="SRC"
+# Directory for the output files
+DEST="DEST"
+
+# Create destination directory if it doesn't exist
+mkdir -p "$DEST"
+
+# Loop through all video files in the SRC directory
+for file in "$SRC"/*; do
+    if [[ -f "$file" ]]; then
+        # Extract the filename without extension
+        filename=$(basename -- "$file")
+        filename_no_ext="${filename%.*}"
+
+        # Encode the file to H.265 (HEVC) format
+        ffmpeg -i "$file" \
+               -vf "scale=1920:1080,fps=24" \
+               -c:v libx265 \
+               -preset slow \
+               -crf 23 \
+               -pix_fmt yuv420p \
+               -c:a copy \
+               "$DEST/${filename_no_ext}_1080p24_h265.mkv"
+    fi
+done
+
+echo "Encoding completed"

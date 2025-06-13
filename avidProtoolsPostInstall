@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Exit on error and log output
+set -e
+exec > >(tee -a /var/log/protools_postinstall.log) 2>&1
+
+echo "Starting Pro Tools post-install configuration..."
+
+# Disable Avid Link if present
+if [[ -f "/Library/LaunchAgents/com.avid.avidlink.plist" ]]; then
+    echo "Disabling Avid Link..."
+    defaults write "/Library/LaunchAgents/com.avid.avidlink.plist" RunAtLoad -boolean false
+fi
+
+# Copy Helper Application
+echo "Setting up shoetool helper..."
+sudo mkdir -p /Library/PrivilegedHelperTools/
+sudo ditto "/Applications/Pro Tools.app/Contents/Library/LaunchServices/com.avid.bsd.shoetoolv120" "/Library/PrivilegedHelperTools/com.avid.bsd.shoetoolv120"
+
+# Create LaunchDaemon
+echo "Creating LaunchDaemon for shoetool..."
+sudo tee /Library/LaunchDaemons/com.avid.bsd.shoetoolv120.plist > /dev/null <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.avid.bsd.shoetoolv120</string>
+    <key>MachServices</key>
+    <dict>
+        <key>com.avid.bsd.shoetoolv120</key>
+        <true/>
+    </dict>
+    <key>Program</key>
+    <string>/Library/PrivilegedHelperTools/com.avid.bsd.shoetoolv120</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Library/PrivilegedHelperTools/com.avid.bsd.shoetoolv120</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+</dict>
+</plist>
+EOF
+
+# Set permissions
+sudo chmod 644 /Library/LaunchDaemons/com.avid.bsd.shoetoolv120.plist
+sudo chown root:wheel /Library/LaunchDaemons/com.avid.bsd.shoetoolv120.plist
+
+# Load LaunchDaemon
+echo "Loading shoetool LaunchDaemon..."
+sudo /bin/launchctl unload /Library/LaunchDaemons/com.avid.bsd.shoetoolv120.plist 2>/dev/null || true
+sudo /bin/launchctl load -w /Library/LaunchDaemons/com.avid.bsd.shoetoolv120.plist
+
+echo "Pro Tools post-install configuration complete."

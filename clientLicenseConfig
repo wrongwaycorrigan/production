@@ -43,13 +43,13 @@ chmod 664 "$NEATVIDEO_LIC"
 
 # --- Houdini ---
 echo "Configuring Houdini license..."
-zsh /Applications/Houdini/Houdini19.5.682/Frameworks/Houdini.framework/Versions/19.5/Resources/bin/hserver -S ucalic
+zsh /Applications/Houdini/Houdini19.5.682/Frameworks/Houdini.framework/Versions/19.5/Resources/bin/hserver -S XXXXX
 
 # --- Cinema 4D ---
 echo "Configuring Cinema 4D license..."
 C4D_CONFIG="/Applications/Maxon Cinema 4D 2024/resource/config.txt"
 sudo rm -f "$C4D_CONFIG"
-curl -s http://ucahub/config.txt --output "$C4D_CONFIG"
+curl -s http://XXXXX/config.txt --output "$C4D_CONFIG"
 
 echo "All configurations completed successfully."
 exit 0

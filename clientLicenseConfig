@@ -1,0 +1,55 @@
+
+#!/bin/bash
+
+# Exit on error
+set -e
+
+# --- Autodesk Maya ---
+echo "Configuring Autodesk Maya license..."
+sudo /Library/Application\ Support/Autodesk/AdskLicensing/Current/helper/AdskLicensingInstHelper change \
+    --prod_key 657Q1 \
+    --prod_ver 2025.0.0.F \
+    --lic_method NETWORK \
+    --lic_server_type SINGLE \
+    --lic_servers "10.X.X.X"
+
+# --- Foundry ---
+echo "Configuring Foundry license..."
+FOUNDRY_LIC="/Library/Application Support/TheFoundry/rlm/foundry_client.lic"
+mkdir -p "$(dirname "$FOUNDRY_LIC")"
+echo "HOST XXXXX ANY XXXX" > "$FOUNDRY_LIC"
+chmod 664 "$FOUNDRY_LIC"
+
+# --- MochaPro ---
+echo "Configuring MochaPro license..."
+MOCHA_LIC="/Library/Application Support/GenArts/rlm/mocha_client.lic"
+mkdir -p "$(dirname "$MOCHA_LIC")"
+echo "HOST XXXXX ANY XXXX" > "$MOCHA_LIC"
+chmod 664 "$MOCHA_LIC"
+
+# --- Maxon One ---
+echo "Configuring Maxon One license..."
+MAXON_LIC="/Users/Shared/Maxon/RLM/client.lic"
+mkdir -p "$(dirname "$MAXON_LIC")"
+echo "HOST XXXXX ANY XXXX" > "$MAXON_LIC"
+chmod 664 "$MAXON_LIC"
+
+# --- NeatVideo ---
+echo "Configuring NeatVideo license..."
+NEATVIDEO_LIC="/Library/Application Support/ABSoft/NeatVideo5-OFX/RLM/neatclient.lic"
+mkdir -p "$(dirname "$NEATVIDEO_LIC")"
+echo "SERVER XXXXX ANY XXXX" > "$NEATVIDEO_LIC"
+chmod 664 "$NEATVIDEO_LIC"
+
+# --- Houdini ---
+echo "Configuring Houdini license..."
+zsh /Applications/Houdini/Houdini19.5.682/Frameworks/Houdini.framework/Versions/19.5/Resources/bin/hserver -S ucalic
+
+# --- Cinema 4D ---
+echo "Configuring Cinema 4D license..."
+C4D_CONFIG="/Applications/Maxon Cinema 4D 2024/resource/config.txt"
+sudo rm -f "$C4D_CONFIG"
+curl -s http://ucahub/config.txt --output "$C4D_CONFIG"
+
+echo "All configurations completed successfully."
+exit 0

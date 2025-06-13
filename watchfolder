@@ -1,0 +1,30 @@
+@echo off
+setlocal
+
+:: Set watch folder and output folder
+set "watch_folder=C:\Users\Public\WatchFolder"
+set "output_folder=C:\Users\Public\WatchFolder\output"
+
+:: Create folders if they don't exist
+if not exist "%watch_folder%" mkdir "%watch_folder%"
+if not exist "%output_folder%" mkdir "%output_folder%"
+
+:: Set path to FFmpeg 
+set "ffmpeg=C:\ffmpeg\bin\ffmpeg.exe"
+
+:: Infinite loop to monitor for new MOV files and transcode to MP4
+:loop
+for %%F in ("%watch_folder%\*.mov") do (
+    if not exist "%output_folder%\%%~nF.mp4" (
+        echo Transcoding %%~nxF...
+        "%ffmpeg%" -i "%%F" -c:v libx264 -c:a aac "%output_folder%\%%~nF.mp4"
+        if errorlevel 1 (
+            echo Error transcoding %%~nxF
+        ) else (
+            echo Successfully transcoded %%~nxF
+        )
+    )
+)
+:: Wait a few seconds before checking again
+timeout /t 5 >nul
+goto loop
